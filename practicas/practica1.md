@@ -12,19 +12,19 @@ Lo más destacabe del proceso de instalación es cuando llegamos a la etapa de `
 
 ## Configuración de red
 
-Tras la instalación de cada máquina configuramos la red para que las maquinas podrán comunicarse:
+Tras la instalación de cada máquina configuramos la red para que las máquinas podrán comunicarse:
 
 En Virtualbox-->Preferencias-->Red añadimos una red ``NAT``:
 
 ![Imagen 2](http://i1210.photobucket.com/albums/cc420/mj4ever001/swap2.png)
 
- Ahora bien en las configuraciones de red de las dos maquinas, en la pestaña del primer adaptador elegimos la opción Red NAT y en nombre ponemos el nombre de la red NAT que hemos creado en la configuración general de VirtualBox.
+ Ahora bien en las configuraciones de red de las dos máquinas, en la pestaña del primer adaptador elegimos la opción Red NAT y en nombre ponemos el nombre de la red NAT que hemos creado en la configuración general de VirtualBox.
 
 ![Imagen 3](http://i1210.photobucket.com/albums/cc420/mj4ever001/swap3.png)
 
-Ahora las maquinas están en la misma red NAT, tendrán direcciones IP diferentes y por supueto podrán comunicarse.
+Ahora las máquinas están en la misma red NAT, tendrán direcciones IP diferentes y por supueto podrán comunicarse.
 
-Arrancamos las dos maquinas, ejecutamos el comando ``ifconfig`` y apuntamos las direcciones IP de las maquinas:
+Arrancamos las dos máquinas, ejecutamos el comando ``ifconfig`` y apuntamos las direcciones IP de las máquinas:
 
 ![Imagen 4](http://i1210.photobucket.com/albums/cc420/mj4ever001/swap4.png)
 
@@ -57,11 +57,11 @@ Una vez instalada la herramienta cURL creamos un fichero html de prueba en el di
 ```html
 <HTML>
 <BODY>
-Prueba!, maquina X
+Prueba!, máquina X
 </BODY>
 </HTML>
 ```
-Desde la maquina 1 accedemos al fichero ``hola.html`` de la maquina 2 y ``viceversa``, usando el siguiente comando:
+Desde la máquina 1 accedemos al fichero ``hola.html`` de la máquina 2 y viceversa usando el siguiente comando:
 
 ``$ curl http://IP/hola.html``
 

@@ -61,7 +61,7 @@ Prueba!, maquina X
 </BODY>
 </HTML>
 ```
-Desde la maquina 1 accedemos al fichero ``hola.html`` de la maquina 2 y ``viceversa``, usando el siguiente comando:
+Desde la maquina 1 accedemos al fichero ``hola.html`` de la maquina 2 y viceversa usando el siguiente comando:
 
 ``$ curl http://IP/hola.html``
 
