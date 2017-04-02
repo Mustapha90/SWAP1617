@@ -24,7 +24,7 @@ En Virtualbox-->Preferencias-->Red añadimos una red ``NAT``:
 
 Ahora las maquinas están en la misma red NAT, tendrán direcciones IP diferentes y por supueto podrán comunicarse.
 
-Arrancamos las dos maquinas y ejecutamos el comando ``ifconfig`` y apuntamos las direcciones IP de las maquinas:
+Arrancamos las dos maquinas, ejecutamos el comando ``ifconfig`` y apuntamos las direcciones IP de las maquinas:
 
 ![Imagen 4](http://i1210.photobucket.com/albums/cc420/mj4ever001/swap4.png)
 

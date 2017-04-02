@@ -1,6 +1,6 @@
 # Práctica 1. Preparación de las herramientas
 
-##Instalación de las máquinas virtuales
+## Instalación de las máquinas virtuales
 
 El objetivo de la práctica es instalar y configurar dos máquinas virtuales con Ubuntu Server para poder realizar las prácticas de la asignatura.
 
@@ -10,7 +10,7 @@ Lo más destacabe del proceso de instalación es cuando llegamos a la etapa de `
 
 ![Imagen 1](http://i1210.photobucket.com/albums/cc420/mj4ever001/swap1.png)
 
-##Configuración de red
+## Configuración de red
 
 Tras la instalación de cada máquina configuramos la red para que las maquinas podrán comunicarse:
 
@@ -24,12 +24,12 @@ En Virtualbox-->Preferencias-->Red añadimos una red ``NAT``:
 
 Ahora las maquinas están en la misma red NAT, tendrán direcciones IP diferentes y por supueto podrán comunicarse.
 
-Arrancamos las dos maquinas y ejecutamos el comando ``ifconfig`` y apuntamos las direcciones IP de las maquinas:
+Arrancamos las dos maquinas, ejecutamos el comando ``ifconfig`` y apuntamos las direcciones IP de las maquinas:
 
 ![Imagen 4](http://i1210.photobucket.com/albums/cc420/mj4ever001/swap4.png)
 
 
-##Comprobación de la instalación de apache
+## Comprobación de la instalación de apache
 
 Después de la instalación de las máquinas podemos comprobar la versión del servidor instalado ejecutando:
 
@@ -44,7 +44,7 @@ Y para comprobar si está ejecutando:
 ![Imagen 6](http://i1210.photobucket.com/albums/cc420/mj4ever001/swap6.png)
 
  
-##Prueba del servidor
+## Prueba del servidor
 
 Para probar el servidor instalamos cURL que es una herramienta de línea de comandos para transferir archivos con sintaxis URL que soporta diferentes protocolos.
 
