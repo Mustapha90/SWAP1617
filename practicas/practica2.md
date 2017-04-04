@@ -1,4 +1,4 @@
-# Práctica 1. Clonar la información de un sitio web
+# Práctica 2. Clonar la información de un sitio web
 
 ## Objetivos de la práctica
 
@@ -108,7 +108,7 @@ En este apartado vamos a programar una tarea con ``cron`` para que se ejecute ca
 Abrimos el fichero ``/etc/crontab`` y añadimos la siguiente linea:
 
 ```
-0	*	*	*	*	mustapha	rsync -avz -e ssh 10.0.2.4:/var/www/ /var/www/``
+0   *   *   *   *   mustapha   rsync -avz -e ssh 10.0.2.4:/var/www/ /var/www/``
 ```
 
 ![Imagen 6](http://i1210.photobucket.com/albums/cc420/mj4ever001/p2cap6.png)
