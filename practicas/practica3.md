@@ -190,9 +190,9 @@ Service
 	End
 End
 ```
-En el bloque ``ListenHTTP`` especificamos donde escuchará pound las peticiones, usando ``0.0.0.0`` como dirección escuchará en el puerto 80 en todas las interfaces de la máquina.
+En el bloque ``ListenHTTP`` especificamos donde escuchará pound las peticiones, usando ``0.0.0.0`` como dirección escuchará en el puerto 80 en todas las interfaces de red de la máquina.
 
-Dentro del bloque ``Service`` podemos añadir tantos bloques BackEnd como servidores tengamos, en nuestro caso las dos máquinas que tenemos.
+Dentro del bloque ``Service`` podemos añadir tantos bloques BackEnd como servidores tengamos.
 
 Priority indica la prioridad que el balanceador usará para desviar peticiones a una máquina o a otra, usando ``Priority 1`` la carga se repartirá de manera equitativa.
 
