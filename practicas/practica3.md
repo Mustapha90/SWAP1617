@@ -95,104 +95,127 @@ Volvemos a probar el balanceado:
 
  ![Imagen 5](http://i1210.photobucket.com/albums/cc420/mj4ever001/p3cap5.png)
 
-## Prueba de la copia de archivos por ssh
+## Balanceado de carga con haproxy
 
-Para probar la copia de archivos por ssh vamos a crear un tar del directorio home de la máquina 1 directamente en la máquina 2 combinando el comando tar y ssh con un ``pipeline``.
+### Instalación y configuración de la máquina virtual
 
-``$ tar czf - home | ssh 10.0.2.15 'cat > ~/tar.tgz'``
+La instalación y la configuración de red de la máquina virtual es idéntica a la de nginx.
 
-Donde ``home`` es la carpeta home de la máquina 1 y ``10.0.2.15`` es la dirección IP de la máquina 2, usando el comando ``cat > ~/tar.tgz`` conseguimos guardar el fichero transferido en la carpeta home de la máquina 2.
+Instalamos haproxy:
 
-![Imagen 1](http://i1210.photobucket.com/albums/cc420/mj4ever001/p2cap1.png)
+``$ sudo apt-get install haproxy``
 
-## Clonado de una carpeta entre las dos máquinas usando rsync
+Ya tenemos la máquina preparada:
 
-La copia de archivos por ssh no es adecuada para sincronizar grandes cantidades de información, en este caso podemos usar la herramienta ``rsync`` que está desarrollada para realizar este tipo de tareas.
+![Imagen 6](http://i1210.photobucket.com/albums/cc420/mj4ever001/p3cap6.png)
 
-### 1 Instalación de la herramienta rsync
+### Configuración de haproxy
 
-La herramienta viene instalada en Ubuntu Server 16.04 pero si no está instalada la podemos instalar con los siguientes comandos:
+Abrimos el fichero de configuración de haproxy localizado en ``/etc/haproxy/haproxy.cfg``
 
-``$ sudo apt-get update``
+``$ sudo vim /etc/haproxy/haproxy.cfg``
 
-``$ sudo apt-get install rsync``
-
-### 2 Prueba de la herramienta rsync
-
-La prueba la podemos hacer como usuario root o usuario sin privilegios, la vamos a realizar como usuario sin privilegios porque es una buena práctica usar root sólo cuando sea necesario y este no es el caso.
-
-La prueba consiste realizar un respaldo del espacio web ``/var/www`` de una máquina en otra, para ello hacemos que el usuario si privilegios de cada máquina sea el dueño del espacio web de su máquina usando el comando ``chown``
-
-``sudo chown mustapha:mustapha –R /var/www``
-
-![Imagen 2](http://i1210.photobucket.com/albums/cc420/mj4ever001/p2cap2.png)
-
-Usando ``rsync`` y ``ssh`` copiamos el directorio ``/var/www/`` de la máquina 1 en la máquina 2, el comando lo ejecutamos desde la máquina 2:
-
-``$ rsync -avz -e ssh 10.0.2.4:/var/www/ /var/www/``
-
-Donde ``10.0.2.4`` es la dirección IP de la máquina que queremos copiar su directorio ``/var/www/`` (máquina 1)
-
-Nos pedirá la contraseña del usuario de la máquina 1, la introducimos y listo.
-
-![Imagen 3](http://i1210.photobucket.com/albums/cc420/mj4ever001/p2cap3.png)
-
-## Acceso sin contraseña para ssh
-
-Queremos poder acceder desde la máquina secundaria (máquina 2) a la máquina 1 sin introducir la contraseña, esto es importante cuando se quiere automatizar tareas mediante scripts o cron.
-
-Hay que seguir los siguientes pasos:
-
-### 1. Generación de un par de claves ssh en la máquina secundaria
-
-En la máquina secundaria generamos un par de claves (pública/privada) usando el comando ``ssh-keygen``
-
-``$ ssh-keygen -b 4096 -t rsa``
-
-Donde:
-
-    **-t** : Especifica el tipo de clave que hay que generar, en este caso hemos generado una clave rsa que generará el fichero ``~/.ssh/id_rsa`` para la clave privada y el
-fichero ``~/.ssh/id_rsa.pub`` para la clave pública.
-
-	**-b**: Especifica el tamaño de la clave en bytes
-
-El comando nos pedirá una contraseña que es usada para hacer la clave más segura, debemos dejarla en blanco ya que el objetivo es conectar sin contraseña.
-
-### 2. Copia de la clave pública generada al equipo remoto (máquina principal)
-
-Copiamos la clave pública generada en el paso anterior a la máquina principal (máquina 1) usando el comando ``ssh-copy-id``
-
-
-``$ ssh-copy-id 10.0.2.4``
-
-``10.0.2.4`` es la dirección IP de la máquina remota (máquina 1).
-
-Nos pedirá la contraseña de la máquina remota, la introducimos y listo.
-
-![Imagen 4](http://i1210.photobucket.com/albums/cc420/mj4ever001/p2cap4.png)
-
-### 2. Prueba del acceso ssh sin contraseña
-
-Por último probamos el acceso sin contraseña que acabamos de configurar usando el siguiente comando:
-
-``$ ssh 10.0.2.4``
-
-![Imagen 5](http://i1210.photobucket.com/albums/cc420/mj4ever001/p2cap5.png)
-
-Como podemos ver en la imagen ya podemos acceder sin contraseña.
-
-
-## Programación de tareas con crontab
-
-En este apartado vamos a programar una tarea con ``cron`` para que se ejecute cada hora para mantener actualizado el contenido del directorio ``/var/www`` entre las dos máquinas.
-
-Abrimos el fichero ``/etc/crontab`` y añadimos la siguiente linea:
+Y ponemos la siguiente configuración:
 
 ```
-0   *   *   *   *   mustapha   rsync -avz -e ssh 10.0.2.4:/var/www/ /var/www/``
+global
+	daemon
+	maxconn 256
+defaults
+	mode http
+	contimeout 4000
+	clitimeout 42000
+	srvtimeout 43000
+
+frontend http-in
+	bind *:80
+	default_backend servers
+
+backend servers
+	server m1 10.0.2.4 maxconn 32
+	server m2 10.0.2.15 maxconn 32
 ```
 
-![Imagen 6](http://i1210.photobucket.com/albums/cc420/mj4ever001/p2cap6.png)
+Guardamos la configuración y lanzamos el servicio haproxy:
 
+``$ sudo /usr/sbin/haproxy -f /etc/haproxy/haproxy.cfg``
 
+Probamos el balanceado de carga haciendo peticiones a haproxy:
 
+``$ curl http://balanceador1/hola.html``
+
+"balanceador1" es el nombre del servidor de la máquina haproxy que se ha definido en el fichero hosts en el anfitrión.
+
+![Imagen 7](http://i1210.photobucket.com/albums/cc420/mj4ever001/p3cap7.png)
+
+## Balanceado de carga con pound 
+
+### Instalación y configuración de la máquina virtual
+
+La instalación y la configuración de red de la máquina virtual es idéntica las anteriores.
+
+Instalamos pound:
+
+``$ sudo apt-get install pound``
+
+Ya tenemos la máquina preparada:
+
+![Imagen 8](http://i1210.photobucket.com/albums/cc420/mj4ever001/p3cap8.png)
+
+### Configuración de pound
+
+Abrimos el fichero de configuración de pound localizado en ``/etc/pound/pound.cfg``
+
+``$ sudo vim /etc/pound/pound.cfg``
+
+Y ponemos la siguiente configuración:
+
+```
+ListenHTTP
+	Address 0.0.0.0
+	Port 80
+End
+
+Service
+	BackEnd
+		Address 10.0.2.4
+		Port    80
+		Priority 1
+	End
+
+	BackEnd
+		Address 10.0.2.15
+		Port    80
+		Priority 1
+	End
+End
+```
+En el bloque ``ListenHTTP`` especificamos donde escuchará pound las peticiones, usando ``0.0.0.0`` como dirección escuchará en el puerto 80 en todas las interfaces de la máquina.
+
+Dentro del bloque ``Service`` podemos añadir tantos bloques BackEnd como servidores tengamos, en nuestro caso las dos máquinas que tenemos.
+
+Priority indica la prioridad que el balanceador usará para desviar peticiones a una máquina o a otra, usando ``Priority 1`` la carga se repartirá de manera equitativa.
+
+Guardamos el fichero de configuración y abrimos ahora el fichero ``/etc/default/pound``, este fichero contiene una variable llamada ``startup`` que inicialmente es igual 0, si no se cambia su valor a 1 no podemos inciar el servicio pound.
+
+``$ sudo vim /etc/default/pound``
+
+```
+# Defaults for pound initscript
+# sourced by /etc/init.d/pound
+# installed at /etc/default/pound by the maintainer scripts
+
+# prevent startup with default configuration
+# set the below varible to 1 in order to allow pound to start
+startup=1
+```
+
+Salvamos el fichero anterior y lanzamos el servicio pound:
+
+``$ sudo systemctl start pound``
+
+Probamos ahora el balanceado de carga:
+
+``$ curl http://balanceador2/hola.html``
+ 
+![Imagen 9](http://i1210.photobucket.com/albums/cc420/mj4ever001/p3cap9.png)
