@@ -246,6 +246,8 @@ Y por último con pound:
 
 Para comparar los resultados he usado el número de peticiones por segundo como criterio, ya que es el criterio más importante.
 
-![Imagen 15](http://i1210.photobucket.com/albums/cc420/mj4ever001/p3cap14.png)
+![Imagen 15](http://i1210.photobucket.com/albums/cc420/mj4ever001/p3cap15.png)
 
-Como se ve en la gráfica, hemos obtenido el mejor resultado usando Nginxm en segundo lugar tenemos haproxy y en tercer lugar pound.
+Como se ve en la gráfica, el mejor resultado lo hemos obtenido con nginx.
+
+
