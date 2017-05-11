@@ -194,7 +194,7 @@ En el bloque ``ListenHTTP`` especificamos donde escuchará pound las peticiones,
 
 Dentro del bloque ``Service`` podemos añadir tantos bloques BackEnd como servidores tengamos.
 
-Priority indica la prioridad que el balanceador usará para desviar peticiones a una máquina o a otra, usando ``Priority 1`` la carga se repartirá de manera equitativa.
+Priority indica la prioridad que el balanceador usará para desviar peticiones a una máquina o a otra, usando ``Priority 1`` para las dos máquinas, la carga se repartirá de manera equitativa.
 
 Guardamos el fichero de configuración y abrimos ahora el fichero ``/etc/default/pound``, este fichero contiene una variable llamada ``startup`` que inicialmente es igual 0, si no se cambia su valor a 1 no podemos inciar el servicio pound.
 
@@ -219,3 +219,33 @@ Probamos ahora el balanceado de carga:
 ``$ curl http://balanceador2/hola.html``
  
 ![Imagen 9](http://i1210.photobucket.com/albums/cc420/mj4ever001/p3cap9.png)
+
+## Someter a una alta carga el servidor balanceado
+
+En este apartado usaremos la herramienta Apache Benchmark (ab) para someter el servidor balanceado a una alta carga.
+
+Empezamos con Nginx, usando ab lanzamos 1000 peticiones con un nivel de concurrencia de 10:
+
+``$ ab -n 1000 -c 10 http://balanceador/index.html``
+
+![Imagen 12](http://i1210.photobucket.com/albums/cc420/mj4ever001/p3cap12.png)
+
+Hacemos lo mismo con haproxy:
+
+``$ ab -n 1000 -c 10 http://balanceador1/index.html``
+
+![Imagen 13](http://i1210.photobucket.com/albums/cc420/mj4ever001/p3cap13.png)
+
+Y por último con pound:
+
+``$ ab -n 1000 -c 10 http://balanceador2/index.html``
+
+![Imagen 14](http://i1210.photobucket.com/albums/cc420/mj4ever001/p3cap14.png)
+
+**Resultados del experimento:**
+
+Para comparar los resultados he usado el número de peticiones por segundo como criterio, ya que es el criterio más importante.
+
+![Imagen 15](http://i1210.photobucket.com/albums/cc420/mj4ever001/p3cap14.png)
+
+Como se ve en la gráfica, hemos obtenido el mejor resultado usando Nginxm en segundo lugar tenemos haproxy y en tercer lugar pound.
