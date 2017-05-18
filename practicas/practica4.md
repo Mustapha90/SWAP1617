@@ -1,6 +1,6 @@
 # Práctica 4. Asegurar la granja web
 
-## Configuración del acceso por HTTPS 
+## 1. Configuración del acceso por HTTPS 
 
 Para configurar el acceso por HTTPS a las máquinas servidoras tenemos que crear primero un certificado autofirmado, usando los siguientes comandos:
 
@@ -49,7 +49,7 @@ Podemos también probar el acceso HTTPS usando el comando cURL:
 
 Hemos usado el argumento ``--insecure`` para evitar los avisos de seguridad.
 
-## Configuración del cortafuegos
+## 2. Configuración del cortafuegos
 
 Para asegurar nuestra granja web tenemos que configurar el cortafuego usando la herramienta ``iptables`` para denegar accesos indebidos, permitiendo solamente el acceso por los puertos que nosotros definimos, en nuestro caso van a ser el puerto 80 (HTTP), el 443 (HTTPS) y el 22 (SSH).
 
@@ -102,7 +102,145 @@ Volvemos a comprobar el acceso por HTTP y HTTPS:
 
 ![Imagen 4](http://i1210.photobucket.com/albums/cc420/mj4ever001/p4cap4.png)
 
-Por últimos para que la configuración del cortafuegos sea permanente, copiamos el contenido del script de configuración al fichero ``/etc/rc.local``
+Por último, para que la configuración del cortafuegos sea permanente, copiamos el contenido del script de configuración al fichero ``/etc/rc.local``
 
 ![Imagen 5](http://i1210.photobucket.com/albums/cc420/mj4ever001/p4cap5.png)
 
+## 3. Configuración de una máquina como cortafuegos para la granja web (Segunda tarea opcional)
+
+En este apartado explicaremos como configurar una máquina para funcionar como un cortafuegos que permite el acceso solamente a los puertos HTTP y HTTPS, estos accesos se redireccionan al balanceador que repartirá la carga entre las dos máquinas servidoras.
+
+### 3.1 Configuración del acceso por HTTPS en el balanceador
+
+Para que nginx pueda recibir peticiones HTTPS hay que que seguir los siguientes pasos:
+
+Primero creamos un certificado autofirmado de la misma manera del apartado 1.
+
+Una vez creado el certificado, pasamos a configurar Nginx para aceptar peticiones HTTPS, para ello abrimos el fichero de configuración de nginx:
+
+``$ sudo nano /etc/nginx/conf.d/default.conf``
+
+El fichero de configuración tendrá el siguiente contenido:
+
+```
+upstream apaches{
+	server 10.0.2.4 weight=2;
+	server 10.0.2.15 weight=1;
+}
+
+server{
+        listen 10.0.2.5:80;
+	listen 443 default ssl;
+	ssl_certificate      /etc/nginx/ssl/server.crt;
+	ssl_certificate_key  /etc/nginx/ssl/server.key;
+        access_log /var/log/nginx/balanceador.access.log;
+        error_log /var/log/nginx/balanceador.error.log;
+        root /var/www/;
+        location /
+        {
+                proxy_pass http://apaches;
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_http_version 1.1;
+                proxy_set_header Connection "";
+        }
+}
+```
+
+Guardamos los cambios y reiniciamos nginx:
+
+``$ sudo service nginx reload``
+
+### 3.2 Configuración del cortafuegos de la máquina del balanceador
+
+Como todo el tráfico tiene que pasar por la máquina que tendrá configurado el cortafuegos que vamos a llamar ``m5``, tenemos que prohibir el acceso directo al balanceador y permitir solamente los accesos que provienen desde la propia granja, o sea desde la m5, m1 o m2.
+
+Creamos un script para configurar el cortafuegos con el siguiente contenido:
+
+```shell
+#!/bin/bash
+
+# Eliminar la configuración actual
+iptables -F
+iptables -X
+iptables -t nat -F
+iptables -t nat -X
+iptables -t mangle -F
+iptables -t mangle -X
+
+# Denegar todo el tráfico
+iptables -P INPUT DROP
+iptables -P OUTPUT DROP
+iptables -P FORWARD DROP;
+
+# Permitir el acceso al puerto 22 (SSH)
+iptables -A INPUT -p tcp --dport 22 -j ACCEPT
+iptables -A OUTPUT -p tcp --sport 22 -j ACCEPT
+
+# Permitir tráfico entre el balanceador y la máquina cortafuegos (m5) 
+iptables -I INPUT -s 10.0.2.7 -j ACCEPT
+iptables -I OUTPUT -d 10.0.2.7 -j ACCEPT
+
+# Permitir tráfico entre el balanceador y la máquina servidora (m1) 
+iptables -I INPUT -s 10.0.2.4 -j ACCEPT
+iptables -I OUTPUT -d 10.0.2.4 -j ACCEPT
+
+# Permitir tráfico entre el balanceador y la máquina servidora (m2) 
+iptables -I INPUT -s 10.0.2.15 -j ACCEPT
+iptables -I OUTPUT -d 10.0.2.15 -j ACCEPT
+```
+
+Ejecutamos el script para terminar la configuración del balanceador.
+
+### 3.3 Configuración de la máquina cortafuegos
+
+Creamos un script con las reglas necesarias para configurar el cortafuegos:
+
+```
+#!/bin/bash
+
+# Eliminar la configuración actual
+iptables -F
+iptables -X
+iptables -t nat -F
+iptables -t nat -X
+iptables -t mangle -F
+iptables -t mangle -X
+
+# Denegar el tráfico entrante y saliente
+iptables -P INPUT DROP
+iptables -P OUTPUT DROP
+
+# Permitir el redirecionamiento de tráfico
+iptables -P FORWARD ACCEPT
+
+# Permitir el acceso al puerto 22
+iptables -A INPUT -p tcp --dport 22 -j ACCEPT
+iptables -A OUTPUT -p tcp --sport 22 -j ACCEPT
+
+# Redireccionar todas las peticiones HTTP al balanceador
+iptables -t nat -A PREROUTING -p tcp --dport 80 -j DNAT --to-destination 10.0.2.5:80
+
+iptables -t nat -A POSTROUTING -j MASQUERADE
+
+# Redireccionar todas las peticiones HTTPS al balanceador
+iptables -t nat -A PREROUTING -p tcp --dport 443 -j DNAT --to-destination 10.0.2.5:443
+
+iptables -t nat -A POSTROUTING -j MASQUERADE
+
+```
+
+Ejecutamos el script
+
+``$ sudo ./script_firewall``
+
+Por último, probamos la configuración que hemos realizado, haciendo peticiones a la máquina cortafuegos:
+
+**Por HTTP:**
+
+![Imagen 6](http://i1210.photobucket.com/albums/cc420/mj4ever001/p4cap6.png)
+
+**Y por HTTPS:**
+
+![Imagen 7](http://i1210.photobucket.com/albums/cc420/mj4ever001/p4cap7.png)
