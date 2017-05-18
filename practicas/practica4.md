@@ -55,7 +55,7 @@ Para asegurar nuestra granja web tenemos que configurar el cortafuego usando la 
 
 Creamos un script con los comandos necesarios para configurar el cortafuegos:
 
-```bash
+```shell
 # (1) Eliminar todas las reglas (configuración limpia)
 iptables -F
 iptables -X
