@@ -2,7 +2,7 @@
 
 ## Configuración RAID 1 
 
-Es un tipo de RAID por software, es utilizado para garantizar la integridad de los datos: en caso de fallo de un disco duro, es posible continuar las operaciones en el otro disco duro sin ningun problema. No se mejora el rendimiento y los otros discos duros son ocultos. Es necesario tener al menos dos discos duros. 
+El RAID 1 es un tipo de RAID por software, es utilizado para garantizar la integridad de los datos: en caso de fallo de un disco duro, es posible continuar las operaciones en el otro disco duro sin ningún problema. No se mejora el rendimiento y los otros discos duros son ocultos. Es necesario tener al menos dos discos duros. 
 
 El RAID 1 comúnmente llamado "mirroring" debido a que éste hace una simple copia del primer disco (por lo que para 2 discos de igual tamaño, obtenemos un espacio de almacenamiento igual al espacio de un solo disco).
 
@@ -48,9 +48,9 @@ Creamos un directorio donde se montará la unidad RAID y la montamos en ese dire
 
 Ahora comprobamos el estado del disco RAID 1
 
-![Imagen 4](http://i1210.photobucket.com/albums/cc420/mj4ever001/p6cap4.png)
-
 ``$ sudo mdadm --detail /dev/md0``
+
+![Imagen 4](http://i1210.photobucket.com/albums/cc420/mj4ever001/p6cap4.png)
 
 Como podemos ver en la captura anterior, el disco RAID está configurado correctamente.
 
@@ -84,7 +84,7 @@ Intentamos acceder a la información almacenada en el RAID:
 
 ![Imagen 7](http://i1210.photobucket.com/albums/cc420/mj4ever001/p6cap7.png)
 
-Como se ve en la captura anterior el hecho de un disco ha fallado no causa ningún problema a la hora de acceder a los datos en el RAID.
+Como se ve en la captura anterior el hecho de que un disco ha fallado no causa ningún problema a la hora de acceder a los datos en el RAID.
 
 Comprobamos ahora el estado del RAID:
 
