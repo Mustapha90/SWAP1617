@@ -54,23 +54,25 @@ MySQL ofrece la posibilidad de realizar copias de seguridad de bases de datos ut
 El fichero de copia de seguridad generado por mysqldump contiene comandos SQL para crear
 la BD, las tablas y rellenarlas.
 
-Para realizar la copia de seguridad, primero tenemos que bloquear temporalmente la base de datos para evitar que se acceda a ella para mientras se está haciendo la copia de seguridad.
+Para realizar la copia de seguridad, primero tenemos que bloquear temporalmente la base de datos para evitar que se acceda a ella mientras se está haciendo la copia de seguridad.
 
 Accedemos otra vez a la linea de comandos de mysql:
 
-``mysql -u root –p``
+``$ mysql -u root –p``
 
 Ejecutamos el siguiente comando:
 
-```
+```sql
 mysql> FLUSH TABLES WITH READ LOCK;
 ```
 
 Para salir ejecutamos:
 
-``mysql> quit``
+```sql
+mysql> quit;
+```
 
-Ahora podemos realizar la copia de seguridad usando mysqldimp:
+Ahora podemos realizar la copia de seguridad usando mysqldump:
 
 ``mysqldump contactos -u root -p > /tmp/contactos.sql``
 
@@ -78,7 +80,7 @@ El comando anterior nos guardará el fichero de la copia de seguridad en la carp
 
 Y para terminar, desbloqueamos las tablas de la base de datos:
 
-```
+```sql
 mysql> UNLOCK TABLES;
 
 mysql> quit
@@ -91,7 +93,7 @@ En la máquina 2 copiamos el fichero de la copia de seguridad desde la máquina 
 
 Ahora ya tenemos el fichero de copia de seguridad en el directorio ``/tmp/`` de la máquina 2
 
-Antes de restaurar la copia de seguridad, debemos primero crear una base de datos
+Antes de restaurar la copia de seguridad, primero debemos crear una base de datos
 
 Accedemos a la interfaz de linea de comandos mysql
 
