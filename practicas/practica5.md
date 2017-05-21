@@ -6,35 +6,42 @@ Accedemos a la linea de comandos de ``mysql``:
 
 ``$ mysql -u root -p``
 
-Creamos una base de datos con llamada ``contactos`` y dentro de esa base de datos creamos una tabla llamada ``datos``
+Creamos una base de datos ``contactos`` y dentro de esa base de datos creamos una tabla ``datos``
 
 ```sql
 
-create database contactos;
+mysql> create database contactos;
 
-use contactos;
+mysql> use contactos;
 
-create table datos(nombre varchar(100),tlf int);
+mysql> create table datos(nombre varchar(100),tlf int);
 
 ```
 
 Ahora insertamos una entrada en la tabla datos:
 
 
-``insert into datos(nombre,tlf) values ("pepe",95834987);``
+```sql
+mysql> insert into datos(nombre,tlf) values ("pepe",95834987);
+```
 
 Comprobamos que los datos se han insertado correctamente:
 
-``select * from datos``
+```sql
+mysql> select * from datos;
+```
 
 Para mostrar las tablas de la base de datos, ejecutamos:
 
-``show tables;``
+```sql
+mysql> show tables;
+```
 
 Para mostrar el equema de la tabla creada, ejecutamos:
 
-``describe datos;``
-
+```sql
+mysql> describe datos;
+```
 
 ![Imagen 1](http://i1210.photobucket.com/albums/cc420/mj4ever001/p5cap1.png)
 
