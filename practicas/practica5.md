@@ -205,7 +205,7 @@ server-id = 2
 
 Ahora ejectamos la siguiente sentencia sql para que el ``SLAVE`` pueda acceder a la base de datos ``MASTER``:
 
-```
+```sql
 mysql> CHANGE MASTER TO MASTER_HOST='10.0.2.4',
 MASTER_USER='esclavo', MASTER_PASSWORD='esclavo',
 MASTER_LOG_FILE='mysql-bin.000002', MASTER_LOG_POS=154,
@@ -246,7 +246,7 @@ Primero desbloqueamos las tablas:
 
 Insertamos algunos datos:
 
-```
+```sql
 insert into datos(nombre,tlf) values ("Mustapha",603297721);
 
 insert into datos(nombre,tlf) values ("Juan",675433234);
