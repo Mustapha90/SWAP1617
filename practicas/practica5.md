@@ -97,21 +97,23 @@ Antes de restaurar la copia de seguridad, primero debemos crear una base de dato
 
 Accedemos a la interfaz de linea de comandos mysql
 
-``mysql -u root –p``
+``$ mysql -u root –p``
 
 Creamos una base de datos
 
-``mysql> CREATE DATABASE contactos;``
+```sql
+mysql> CREATE DATABASE contactos;
 
-``mysql> quit;``
+mysql> quit;
+```
 
 Y por último importamos la base de datos desde la copia de seguridad:
 
-``mysql -u root -p contactos < /tmp/contactos.sql``
+``$ mysql -u root -p contactos < /tmp/contactos.sql``
 
 Comprobamos que la replicación se ha realizado correctamente:
 
-```
+```sql
 mysql> use contactos;
 
 mysql> show tables;
@@ -162,12 +164,11 @@ Guardamos la configuración y reiniciamos mysql:
 
 ``$ /etc/init.d/mysql restart``
 
-
 Ahora creamos un usuario y le damos permisos de acceso para la replicación, este usuario será usado por el slave para poder acceder a los datos:
 
 Ejecutamos las siguientes sentencias ``sql``
 
-```
+```sql
 mysql> CREATE USER esclavo IDENTIFIED BY 'esclavo';
 
 mysql> GRANT REPLICATION SLAVE ON *.* TO 'esclavo'@'%' IDENTIFIED BY 'esclavo';
@@ -178,7 +179,6 @@ mysql> FLUSH TABLES;
 
 mysql> FLUSH TABLES WITH READ LOCK;
 ```
-
 
 Y por último, mostramos el estado del master:
 
@@ -195,7 +195,7 @@ Position: 154
 ```
 Ya hemos terminado con la configuración del ``MASTER``
 
-### 3.2 configuración del SLAVE
+### 3.2 Configuración del SLAVE
 
 Accedemos al fichero de configuración mysql, y realizamos la misma configuración que hicimos en el MASTER, la única diferencia será la asignación del identificador del servidor, en este caso vamos a usar el identificador ``2``
 
